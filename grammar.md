@@ -3,7 +3,6 @@
 String数据类型		
 一个key-value 最多存储512M		
 
----
 
 *	SET
 >	SET key value     如果key存在就覆盖		
@@ -52,7 +51,6 @@ String数据类型
 
 #Hash类型	
 
----
 
 	配置文件		
 	hash-max-ziplist-entries 512 512字节
