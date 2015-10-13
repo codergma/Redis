@@ -5,7 +5,7 @@ String数据类型
 ---
 
 *	SET
-	SET key value     如果key存在就覆盖		
+>	SET key value     如果key存在就覆盖		
 	SET key value EX  秒为单位设置过期时间		
 	SET key value PX  毫秒为单位设置过期时间		
 	SET key value NX  key不存在才设置成功		
