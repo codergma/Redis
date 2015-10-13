@@ -51,11 +51,13 @@ String数据类型
 
 
 #Hash类型	
+
+---
+
 	配置文件		
 	hash-max-ziplist-entries 512 512字节
 	hash-max-ziplist-value   64  字段数目
 
----
 
 
 
