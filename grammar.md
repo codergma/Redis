@@ -24,6 +24,32 @@ String数据类型
 
 *	MGET　key [key] 一次得到多个value
 
+*	STRLEN key 获取字符串长度　		
+
+*	SETRANGE key offset value 相当于字符串替换效果	
+
+*	APPEND key value    字符串追加			
+
+*	SETNX key value 等价于　SET key value NX 		
+
+*	SETEX key seconds value 等价于 SET key value EX 		
+
+*	PSETEX　key milliseconds value 等价于　SET key value PSETEX　key
+
+*	INCR key    值加１
+	key不存在，先初始化为０，在加１		
+	value不是数字，报错	
+
+*	INCRBY key int 　值加一个整数		
+
+*	INCRBY key float 值加一个浮点数		
+
+*	DECR Key 		
+
+*	DECRBY key int 				
+
+*	
+
 
 
 
