@@ -12,16 +12,18 @@ String数据类型
 	SET key value XX  key存在才设置成功 		
 
 *	GET key
-	
-	key不存在返回nil 		
+>	key不存在返回nil 		
 	key不是字符串，报错 		
 
 *	GETRANGE key start end 		
-
-	返回字符串中的一部分
+>	返回字符串中的一部分
 
 *	GETSET key value 设置key，并返回旧的value
 
-*
+*	MSET key value [key value] 一次设置多个key,value
+
+*	MGET　key [key] 一次得到多个value
+
+
 
 
