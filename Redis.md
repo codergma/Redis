@@ -29,6 +29,14 @@
 	停止Redis
 		shutdown
 		结束Redis的进程也可以 top命令
+	启动redis-server会有这样的警告
+		WARNING overcommit_memory is set to 0! Background save may fail under low memory condition. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+		按照提示设置即可，重启主机就没有警告了。		
+		etc/sysctl.conf这个目录主要是配置一些系统信息,而且它的内容全部是对应于/proc/sys/这个目录的子目录及文件。
+		vm.overcommit_memory参数有三种可能的配置：
+		　　0 表示检查是否有足够的内存可用，如果是，允许分配；如果内存不够，拒绝该请求，并返回一个错误给应用程序。		
+		　　1 表示内核总是返回true。		
+		　　2 表示根据vm.		overcommit_ratio定义的值，允许分配超出物理内存加上交换内存的请求。vm.overcommit_ratio参数是一个百分比，加上内存量决定内存可以超量分配多少内存。例如，vm.overcommit_ratio值为50，而内存有1GB，那么这意味着在内存分配请求失败前，加上交换内存，内存将允许高达1.5GB的内存分配请求。		
 3.命令返回值
 	
 	1》状态回复
