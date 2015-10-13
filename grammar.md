@@ -1,6 +1,7 @@
 #Redis 语法学习
 
-String数据类型
+String数据类型		
+一个key-value 最多存储512M		
 
 ---
 
@@ -36,8 +37,8 @@ String数据类型
 
 *	PSETEX　key milliseconds value 等价于　SET key value PSETEX　key
 
-*	INCR key    值加１
-	key不存在，先初始化为０，在加１		
+*	INCR key    值加１		
+>	key不存在，先初始化为０，在加１		
 	value不是数字，报错	
 
 *	INCRBY key int 　值加一个整数		
@@ -48,7 +49,15 @@ String数据类型
 
 *	DECRBY key int 				
 
-*	
+
+#Hash类型	
+	配置文件		
+	hash-max-ziplist-entries 512 512字节
+	hash-max-ziplist-value   64  字段数目
+
+---
+
+
 
 
 
