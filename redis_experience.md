@@ -1,5 +1,5 @@
 1. 五种数据类型的使用和内部实现方式：
-String
+* String
 常用命令：
 
 set,get,decr,incr,mget 等。
@@ -13,8 +13,7 @@ String是最常用的一种数据类型，普通的key/value存储都可以归�
 String在redis内部存储默认就是一个字符串，被redisObject所引用，当遇到incr,decr等操作时会转成数值型进行计算，此时redisObject的encoding字段为int.
 
 
-
-Hash
+* Hash
 常用命令：
 
 hget,hset,hgetall 等。
@@ -41,7 +40,7 @@ hget,hset,hgetall 等。
 
 
 
-List
+* List
 常用命令：
 
 lpush,rpush,lpop,rpop,lrange等。
@@ -54,7 +53,7 @@ Redis list的应用场景非常多，也是Redis最重要的数据结构之一�
 
 Redis list的实现为一个双向链表，即可以支持反向查找和遍历，更方便操作，不过带来了部分额外的内存开销，Redis内部的很多实现，包括发送缓冲队列等也都是用的这个数据结构。
 
-Set
+* Set
 常用命令：
 
 sadd,spop,smembers,sunion 等。
@@ -67,7 +66,7 @@ Redis set对外提供的功能与list类似是一个列表的功能，特殊之�
 
 set 的内部实现是一个 value永远为null的HashMap，实际就是通过计算hash的方式来快速排重的，这也是set能提供判断一个成员是否在集合内的原因。
 
-Sorted set
+* Sorted set
 常用命令：
 
 zadd,zrange,zrem,zcard等
@@ -79,3 +78,49 @@ Redis sorted set的使用场景与set类似，区别是set不是自动有序的�
 实现方式：
 
 Redis sorted set的内部使用HashMap和跳跃表(SkipList)来保证数据的存储和有序，HashMap里放的是成员到score的映射，而跳跃表里存放的是所有的成员，排序依据是HashMap里存的score,使用跳跃表的结构可以获得比较高的查找效率，并且在实现上比较简单。
+
+2. 常用内存优化手段与参数
+* 控制hash存储方式
+```
+# 64个以下的成员就是使用线性紧凑存储，超过该值自动转成真正的HashMap
+hash-max-zipmap-entries 512
+# 当 value这个Map内部的每个成员值长度不超过多少字节就会采用线性紧凑存储来节省空间。
+hash-max-zipmap-value 64 
+```
+
+* 控制list存储方式
+```
+# list数据类型多少节点以下会采用去指针的紧凑存储格式。
+list-max-ziplist-entries 512
+# list数据类型节点值大小小于多少字节会采用紧凑存储格式。
+list-max-ziplist-value 64 
+```
+* 控制set存储方式
+```
+set-max-intset-entries 512
+```
+
+* 控制zset的存储方式
+```
+zset-max-ziplist-entries 128
+zset-max-ziplist-value 64
+```
+
+3. 持久化
+* 定时快照方式(snapshot)：
+
+该持久化方式实际是在Redis内部一个定时器事件，每隔固定时间去检查当前数据发生的改变次数与时间是否满足配置的持久化触发的条件，如果满足则通过操作系统fork调用来创建出一个子进程，这个子进程默认会与父进程共享相同的地址空间，这时就可以通过子进程来遍历整个内存来进行存储操作，而主进程则仍然可以提供服务，当有写入时由操作系统按照内存页(page)为单位来进行copy-on-write保证父子进程之间不会互相影响。
+
+该持久化的主要缺点是定时快照只是代表一段时间内的内存映像，所以系统重启会丢失上次快照与重启之间所有的数据。
+
+* 基于语句追加方式(aof)：
+
+aof方式实际类似mysql的基于语句的binlog方式，即每条会使Redis内存数据发生改变的命令都会追加到一个log文件中，也就是说这个log文件就是Redis的持久化数据。
+
+aof的方式的主要缺点是追加log文件可能导致体积过大，当系统重启恢复数据时如果是aof的方式则加载数据会非常慢，几十G的数据可能需要几小时才能加载完，当然这个耗时并不是因为磁盘文件读取速度慢，而是由于读取的所有命令都要在内存中执行一遍。另外由于每条命令都要写log,所以使用aof的方式，Redis的读写性能也会有所下降
+
+4. 总结
+* 根据业务需要选择合适的数据类型，并为不同的应用场景设置相应的紧凑存储参数。
+* 当业务场景不需要数据持久化时，关闭所有的持久化方式可以获得最佳的性能以及最大的内存使用量。
+* 如果需要使用持久化，根据是否可以容忍重启丢失部分数据在快照方式与语句追加方式之间选择其一，不要使用虚拟内存以及diskstore方式。
+* 不要让你的Redis所在机器物理内存使用超过实际内存总量的3/5(maxmemory)。
